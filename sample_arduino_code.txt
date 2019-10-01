@@ -1,0 +1,15 @@
+const int pin=13;
+
+void setup(){
+	Serial.begin(9600)
+}
+
+void loop(){
+	int input=10;
+	
+	if(Serial.available()){
+		input=Serial.readString();
+		Serial.write(input.toInt());
+}}
+
+1.8*=1step
