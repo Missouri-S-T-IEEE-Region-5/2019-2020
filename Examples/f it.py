@@ -56,7 +56,7 @@ Blocks={
 "Block2":[2,7],
 }
 
-image=pygame.image.load("D:\\Personal_Misc\\Region 5 Robotics\\2018-2019\\Mock Bot.png")
+image=pygame.image.load("robot.jpg")
 display_w=800
 display_h=800
 Display=pygame.display.set_mode((display_w,display_h))
