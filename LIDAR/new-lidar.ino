@@ -3,8 +3,6 @@
  * This closes relay, gathers data from the lidar, opens the relay 
  * then sorts then maps the data recieved.
  * This is then repeated as necessary
- * 
- * THE LIDAR GIVES SECTORS OF 16 DEGREES
  */
 
 //const int DATASIZE = 100;
@@ -64,37 +62,44 @@ bool processing = 0;
 
 void loop() {
   const int INPUT_SIZE = 1000; //Amount of bytes that will be sorted each time the relay is triggered
-  int storage[INPUT_SIZE];
+  byte storage[INPUT_SIZE];
   int counting = 0;
-  while (!processing)
+  byte x;
+  int number = 0;
+  while (number < INPUT_SIZE)
   {
     digitalWrite(Relay, HIGH);
     //Trigger the Relay Remove the serial availabe, once relay is triggered start storing data
-    if(Serial.available() )
+    
+    while(Serial.available() && number < INPUT_SIZE)
     {
-     for(int j = 0; j < INPUT_SIZE; j++)
+      
+      x = Serial.read();
+     Serial.println(number);
+     storage[number] = x;
+     number++;
+    //counting++;
+    }
+   }
+   digitalWrite(Relay, LOW);
+     for(int j = 0; j < (INPUT_SIZE-8) && processing == 0; j++)
      {
-       if(Serial.read() != -1)
+       Serial.println(storage[j]);
+       if((storage[j-6] == 0xA5) && (storage[j-5] == 0x5A) && (storage[j] == (0x81)))
        {
-        counting++;
-        storage[j] = Serial.read();
-       }
-     }
-     for(int j = 0; j < (INPUT_SIZE-8); j++)
-     {
-       if((storage[j] == 0xA5) && (storage[j+1] == 0x5A) && (storage[j+7] == (0x81)))
-       {
+         Serial.println("FOUND");
          processing = 1; //Starts doing "Post-processing of current lidar sample set
        }
        else
        {
+        delay(1000);
+        
+        number = 0;
       //Trigger Relay to restart lidar
-          Serial.println(storage[0], HEX);
-          Serial.println(storage[1], HEX);
+          //Serial.println(storage[0], HEX);
+          //Serial.println(storage[1], HEX);
        }
      }
-    }
-  }
   while(processing)
   {
     digitalWrite(Relay, LOW);
@@ -133,6 +138,8 @@ void loop() {
       }
       j=j+count;
     }
+    //processing = 0;
+    
   }
 }
 
