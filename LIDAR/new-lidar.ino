@@ -154,16 +154,19 @@ void loop() {
           //Serial.println(store_angle);
           //Serial.println(((store_angle*(i-1))+Start_ang));
           angle[i] = ((store_angle * (i - 1)) + Start_ang);
-          Serial.println(angle[i]);
+          //Serial.println(angle[i]);
           delay(10);
         }
-      /*
+      
       for(count; count < ((End_Pos - Start_Pos)+count); (count+=2))
       {
         sorting[((count)/2)][0] = (math(storage[count+Start_Pos], storage[count+Start_Pos+1]))/64;
-        sorting[((count)/2)][1] = angle[((count)/2)];
+        sorting[((count)/2)][1] = angle[(((count)/2)) % sample_rate];
+        //Serial.println(sorting[count/2][0]);
+        //Serial.print(" ");
+        Serial.println(sorting[count/2][1]);
       }
-      */
+      
       j=j+count;
       //for(int i=0; i < sample_rate; i++)
       //{
