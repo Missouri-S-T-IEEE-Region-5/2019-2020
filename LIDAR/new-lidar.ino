@@ -140,23 +140,30 @@ void loop() {
         j+=4;//walks to the first sample data
         Start_Pos = j;
         End_Pos = j + sample_rate;
-        for(int i=2; i < sample_rate; i++) // Does intermediate angle calculations
+        store_angle = (End_ang - Start_ang);
+        //store_angle = ((End_ang - Start_ang)/(sample_rate - 1));
+        //Serial.println(store_angle);
+        store_angle = (store_angle/(sample_rate-1));
+        for(int i=2; i < sample_rate-2; i++) // Does intermediate angle calculations
         {
-          Serial.println(Start_ang);
-          Serial.println(End_ang);
-          Serial.println(sample_rate);
-          store_angle = ((End_ang - Start_ang)/(sample_rate - 1));
-          Serial.println(store_angle);
+          //Serial.println(Start_ang);
+          //Serial.println(End_ang);
+          //Serial.println(sample_rate);
+          //Serial.println((End_ang-Start_ang);
+
+          //Serial.println(store_angle);
           //Serial.println(((store_angle*(i-1))+Start_ang));
           angle[i] = ((store_angle * (i - 1)) + Start_ang);
+          Serial.println(angle[i]);
           delay(10);
         }
-      
+      /*
       for(count; count < ((End_Pos - Start_Pos)+count); (count+=2))
       {
         sorting[((count)/2)][0] = (math(storage[count+Start_Pos], storage[count+Start_Pos+1]))/64;
         sorting[((count)/2)][1] = angle[((count)/2)];
       }
+      */
       j=j+count;
       //for(int i=0; i < sample_rate; i++)
       //{
