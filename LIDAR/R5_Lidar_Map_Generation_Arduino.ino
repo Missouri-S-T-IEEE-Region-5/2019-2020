@@ -13,260 +13,262 @@ void loop()
   double adj = 0;
   int bot1 = 0;
   int bot2 = 0;
-  int countbot = 1;
-  int countm = 2;
-  int countc = 1;
-  double senddata[][10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  double xyresult[][10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  int countbot = 0;
+  int countm = 1;
+  int countc = 0;
+  double senddata[][10] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+  double xyresult[][10] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
   int leng = sizeof(sorting[0])/sizeof(sorting[0][0]);
   for (int i = 0; i == leng; i++) // Look at all data and determine Bot side right and left
   {
-    if (i>1 && i<leng && ((sorting[1][i]-sorting[1][i+1]))>28.75) // if next instance is greater then by said amount, then its bot wall 1. Said amount is lowest distance between bot wall 1 and greatest distance between scans.
+    if (i>0 && i<leng && ((sorting[0][i]-sorting[0][i+1]))>28.75) // if next instance is greater then by said amount, then its bot wall 1. Said amount is lowest distance between bot wall 1 and greatest distance between scans.
     {
+      senddata[0][countbot]=sorting[0][i+1];
       senddata[1][countbot]=sorting[1][i+1];
-      senddata[2][countbot]=sorting[2][i+1];
       countbot = countbot++;
       bot1 = i++;
     }
-    if (i>1 && i<leng && ((sorting[1][i]-sorting[1][i-1]))>28.75) // if previous instance is less then by said amount, then its bot wall 2.
+    if (i>0 && i<leng && ((sorting[0][i]-sorting[0][i-1]))>28.75) // if previous instance is less then by said amount, then its bot wall 2.
     {
+      senddata[0][countbot]=sorting[0][i-1];
       senddata[1][countbot]=sorting[1][i-1];
-      senddata[2][countbot]=sorting[2][i-1];
       countbot = countbot++;
       bot2 = i-1;  
     }    
   }
   for (int i = 0; i == leng; i++)
   {
-    if (i==1 && (sorting[1][i+1]-sorting[1][i])<3) // Initial value is midpoint 1 if bot resets to nearest 90degs before scan.
+    if (i==0 && (sorting[0][i+1]-sorting[0][i])<3) // Initial value is midpoint 1 if bot resets to nearest 90degs before scan.
     {
-      senddata[1][3]=sorting[1][1];
-      senddata[2][3]=sorting[2][1];
+      senddata[0][2]=sorting[0][0];
+      senddata[1][2]=sorting[1][0];
     }
-    if (i>1 && i<leng && sorting[1][i]<sorting[1][i+1] && sorting[1][i]<sorting[1][i-1] && (sorting[1][i]-sorting[1][i+1])<28.75 && (sorting[1][i]-sorting[1][i-1])<28.75 && !(i>=bot1 && i<=bot2)) // If next and previous intervals are greater, then its a midpoint, exclude jumps greater then said amount and intervals in bot range.
+    if (i>0 && i<leng && sorting[0][i]<sorting[0][i+1] && sorting[0][i]<sorting[0][i-1] && (sorting[0][i]-sorting[0][i+1])<28.75 && (sorting[0][i]-sorting[0][i-1])<28.75 && !(i>=bot1 && i<=bot2)) // If next and previous intervals are greater, then its a midpoint, exclude jumps greater then said amount and intervals in bot range.
     {
-      if (sorting[2][i]<180 && sorting[2][i]>0) // Select storage locations
+      if (sorting[1][i]<180 && sorting[1][i]>0) // Select storage locations
       {
         countm = 4;
       } 
-      if (sorting[2][i]<270 && sorting[2][i]>90)
+      if (sorting[1][i]<270 && sorting[1][i]>90)
       {
         countm = 5;
       } 
-      if (sorting[2][i]<360 && sorting[2][i]>180)
+      if (sorting[1][i]<360 && sorting[1][i]>180)
       {
         countm = 6;
       }
+      senddata[0][countm]=sorting[0][i];
       senddata[1][countm]=sorting[1][i];
-      senddata[2][countm]=sorting[2][i];
     }
-    if (i>1 && i<leng && sorting[1][i]>sorting[1][i+1] && sorting[1][i]>sorting[1][i-1] && (sorting[1][i]-sorting[1][i+1])<28.75 && (sorting[1][i]-sorting[1][i-1])<28.75 && !(i>=bot1 && i<=bot2)) // If next and previous intervals are lesser, then its a corner, exclude jumps greater then said amount and intervals in bot range.
-        if (sorting[2][i]<90 && sorting[2][i]>0) // Select Storage Locations
+    if (i>0 && i<leng && sorting[0][i]>sorting[0][i+1] && sorting[0][i]>sorting[0][i-1] && (sorting[0][i]-sorting[0][i+1])<28.75 && (sorting[0][i]-sorting[0][i-1])<28.75 && !(i>=bot1 && i<=bot2)) // If next and previous intervals are lesser, then its a corner, exclude jumps greater then said amount and intervals in bot range.
+    {
+        if (sorting[1][i]<90 && sorting[1][i]>0) // Select Storage Locations
         {
             countc = 7;
         } 
-        if (sorting[2][i]<180 && sorting[2][i]>90)
+        if (sorting[1][i]<180 && sorting[1][i]>90)
         {
             countc = 8;
         }
-        if (sorting[2][i]<270 && sorting[2][i]>180)
+        if (sorting[1][i]<270 && sorting[1][i]>180)
         {
             countc = 9;
         }
-        if (sorting[2][i]<360 && sorting[2][i]>270)
+        if (sorting[1][i]<360 && sorting[1][i]>270)
         {
             countc = 10;
         } 
-        senddata[1][countc]=sorting[1][i];
-        senddata[2][countc]=sorting[2][i];    
+        senddata[0][countc]=sorting[0][i];
+        senddata[1][countc]=sorting[1][i];    
+    }
   }
 
-  if (senddata[1][3]==0) // if data is missing, fill in using measurements from nearby cardinal or corners.
+  if (senddata[0][2]==0) // if data is missing, fill in using measurements from nearby cardinal or corners.
   {
-    senddata[1][3]=senddata[1][7]*cos(senddata[2][7]*(PI/180));
-    senddata[2][3]=0;
+    senddata[0][2]=senddata[0][6]*cos(senddata[1][6]*(PI/180));
+    senddata[1][2]=0;
   }
-  if (senddata[1][4]==0)
+  if (senddata[0][3]==0)
   {
-    senddata[1][4]=senddata[1][8]*cos((senddata[2][8]-90)*(PI/180));
-    senddata[2][4]=90;
+    senddata[0][3]=senddata[0][7]*cos((senddata[1][7]-90)*(PI/180));
+    senddata[1][3]=90;
   }
-  if (senddata[1][5]==0)
+  if (senddata[0][4]==0)
   {
-    senddata[1][5]=senddata[1][9]*cos((senddata[2][9]-180)*(PI/180));
-    senddata[2][5]=180;
+    senddata[0][4]=senddata[0][8]*cos((senddata[1][8]-180)*(PI/180));
+    senddata[1][4]=180;
   }
-  if (senddata[1][6]==0)
+  if (senddata[0][5]==0)
   {
-    senddata[1][6]=senddata[1][10]*cos((senddata[2][10]-270)*(PI/180));
-    senddata[2][6]=270;
+    senddata[0][5]=senddata[0][9]*cos((senddata[1][9]-270)*(PI/180));
+    senddata[1][5]=270;
   }
-  if (senddata[1][7]==0)
+  if (senddata[0][6]==0)
   {
-    if (!(senddata[1][4]==0))
+    if (!(senddata[0][3]==0))
     {
-        oppo=senddata[1][4];
+        oppo=senddata[0][3];
     }
-    if (!(senddata[1][3]==0))
+    if (!(senddata[0][2]==0))
     {
-        adj=senddata[1][3];
+        adj=senddata[0][2];
     }
-    senddata[2][7]=atan(oppo/adj)*(PI/180);
-    senddata[1][7]=oppo/sin(senddata[2][7]*(PI/180));
+    senddata[1][6]=atan(oppo/adj)*(PI/180);
+    senddata[0][6]=oppo/sin(senddata[1][6]*(PI/180));
   }
-  if (senddata[1][8]==0)
+  if (senddata[0][7]==0)
   {
-    if (!(senddata[1][5]==0))
+    if (!(senddata[0][4]==0))
     {
-        oppo=senddata[1][5];
+        oppo=senddata[0][4];
     }
-    if (!(senddata[1][4]==0))
+    if (!(senddata[0][3]==0))
     {
-        adj=senddata[1][4];
+        adj=senddata[0][3];
     }
-    senddata[2][8]=atan(oppo/adj)*(PI/180)+90;
-    senddata[1][8]=oppo/sin((senddata[2][8]-90)*(PI/180));
+    senddata[1][7]=atan(oppo/adj)*(PI/180)+90;
+    senddata[0][7]=oppo/sin((senddata[1][7]-90)*(PI/180));
   }
-  if (senddata[1][9]==0)
+  if (senddata[0][8]==0)
   {
-    if (!(senddata[1][6]==0))
+    if (!(senddata[0][5]==0))
     {
-        oppo=senddata[1][6];
+        oppo=senddata[0][5];
     }
-    if (!(senddata[1][5]==0))
+    if (!(senddata[0][4]==0))
     {
-        adj=senddata[1][5];
+        adj=senddata[0][4];
     }
-    senddata[2][9]=atan(oppo/adj)*(PI/180)+180;
-    senddata[1][9]=oppo/sin((senddata[2][9]-180)*(PI/180));
+    senddata[1][8]=atan(oppo/adj)*(PI/180)+180;
+    senddata[0][8]=oppo/sin((senddata[1][8]-180)*(PI/180));
   }
-  if (senddata[1][10]==0)
+  if (senddata[0][9]==0)
   {
-    if (!(senddata[1][3]==0))
+    if (!(senddata[0][2]==0))
     {
-        oppo=senddata[1][3];
+        oppo=senddata[0][2];
     }
-    if (!(senddata[1][6]==0))
+    if (!(senddata[0][5]==0))
     {
-        adj=senddata[1][6];
+        adj=senddata[0][5];
     }
-    senddata[2][10]=atan(oppo/adj)*(PI/180)+270;
-    senddata[1][10]=oppo/sin((senddata[2][10]-270)*(PI/180));
+    senddata[1][9]=atan(oppo/adj)*(PI/180)+270;
+    senddata[0][9]=oppo/sin((senddata[1][9]-270)*(PI/180));
   }
 
   int lengthsd = sizeof(senddata[0])/sizeof(senddata[0][0]);
   for (int i = 0; i == lengthsd; i++) // Go through stored points based on what section it is in
   {
-    if (senddata[2][7]>=senddata[2][i] && senddata[2][3]<=senddata[2][i]) // Evaluate section 1
+    if (senddata[1][6]>=senddata[1][i] && senddata[1][2]<=senddata[1][i]) // Evaluate section 1
     {
-        if (i==3 && !(senddata[1][i]==0)) // Convert midpoint 1 if not missing
+        if (i==2 && !(senddata[0][i]==0)) // Convert midpoint 1 if not missing
         {
-           xyresult[1][3]=senddata[1][3]+senddata[1][5];
-           xyresult[2][3]=senddata[1][6];
+           xyresult[0][2]=senddata[0][2]+senddata[0][4];
+           xyresult[1][2]=senddata[0][5];
         }
-        if (i==7 && !(senddata[1][i]==0)) // Convert corner 1 if not missing
+        if (i==6 && !(senddata[0][i]==0)) // Convert corner 1 if not missing
         {
-           xyresult[1][7]=senddata[1][5]+(senddata[1][7]*cos(senddata[2][7]*(PI/180)));
-           xyresult[2][7]=senddata[1][6]+(senddata[1][7]*sin(senddata[2][7]*(PI/180)));
+           xyresult[0][6]=senddata[0][4]+(senddata[0][6]*cos(senddata[1][6]*(PI/180)));
+           xyresult[1][6]=senddata[0][5]+(senddata[0][6]*sin(senddata[1][6]*(PI/180)));
         }
-        if (!(i==3) && !(i==7) && !(senddata[1][i]==0)) // If bot wall present convert it if not missing
+        if (!(i==2) && !(i==6) && !(senddata[0][i]==0)) // If bot wall present convert it if not missing
         {
-           xyresult[1][i]=senddata[1][5]+(senddata[1][i]*cos(senddata[2][i]*(PI/180)));
-           xyresult[2][i]=senddata[1][6]+(senddata[1][i]*sin(senddata[2][i]*(PI/180)));
+           xyresult[0][i]=senddata[0][4]+(senddata[0][i]*cos(senddata[1][i]*(PI/180)));
+           xyresult[1][i]=senddata[0][5]+(senddata[0][i]*sin(senddata[1][i]*(PI/180)));
         }
     }
-    if (senddata[2][4]>=senddata[2][i] && senddata[2][7]<=senddata[2][i]) // Evaluate section 2
+    if (senddata[1][3]>=senddata[1][i] && senddata[1][6]<=senddata[1][i]) // Evaluate section 2
     {
-        if (i==4 && !(senddata[1][i]==0)) // Convert midpoint 2 if not missing
+        if (i==3 && !(senddata[0][i]==0)) // Convert midpoint 2 if not missing
         {
-           xyresult[1][4]=senddata[1][5];
-           xyresult[2][4]=senddata[1][4]+senddata[1][6];
+           xyresult[0][3]=senddata[0][4];
+           xyresult[1][3]=senddata[0][3]+senddata[0][5];
         }
-        if (!(i==4) && !(i==7) && !(senddata[1][i]==0)) // If bot wall present convert it if not missing
+        if (!(i==3) && !(i==6) && !(senddata[0][i]==0)) // If bot wall present convert it if not missing
         {
-           xyresult[1][i]=senddata[1][5]+(senddata[1][i]*sin((90-senddata[2][i])*(PI/180)));
-           xyresult[2][i]=senddata[1][6]+(senddata[1][i]*cos((90-senddata[2][i])*(PI/180)));
+           xyresult[0][i]=senddata[0][4]+(senddata[0][i]*sin((90-senddata[1][i])*(PI/180)));
+           xyresult[1][i]=senddata[0][5]+(senddata[0][i]*cos((90-senddata[1][i])*(PI/180)));
         }
     }
-   if (senddata[2][8]>=senddata[2][i] && senddata[2][4]<=senddata[2][i]) // Evaluate section 3
+   if (senddata[1][7]>=senddata[1][i] && senddata[1][3]<=senddata[1][i]) // Evaluate section 3
    {
-        if (i==8 && !(senddata[1][i]==0)) // Convert corner 2 if not missing
+        if (i==7 && !(senddata[0][i]==0)) // Convert corner 2 if not missing
         {
-           xyresult[1][8]=senddata[1][5]-(senddata[1][8]*sin((senddata[2][8]-90)*(PI/180)));
-           xyresult[2][8]=senddata[1][6]+(senddata[1][8]*cos((senddata[2][8]-90)*(PI/180)));
+           xyresult[0][7]=senddata[0][4]-(senddata[0][7]*sin((senddata[1][7]-90)*(PI/180)));
+           xyresult[1][7]=senddata[0][5]+(senddata[0][7]*cos((senddata[1][7]-90)*(PI/180)));
         }
-        if (!(i==8) && !(i==4) && !(senddata[1][i]==0)) // If bot wall present convert it if not missing
+        if (!(i==7) && !(i==3) && !(senddata[0][i]==0)) // If bot wall present convert it if not missing
         {
-           xyresult[1][i]=senddata[1][5]-(senddata[1][i]*sin((senddata[2][i]-90)*(PI/180)));
-           xyresult[2][i]=senddata[1][6]+(senddata[1][i]*cos((senddata[2][i]-90)*(PI/180)));
+           xyresult[0][i]=senddata[0][4]-(senddata[0][i]*sin((senddata[0][i]-90)*(PI/180)));
+           xyresult[1][i]=senddata[0][5]+(senddata[0][i]*cos((senddata[1][i]-90)*(PI/180)));
         }
    }
-   if (senddata[2][5]>=senddata[2][i] && senddata[2][8]<=senddata[2][i]) // Evaluate section 4
+   if (senddata[1][4]>=senddata[1][i] && senddata[1][7]<=senddata[1][i]) // Evaluate section 4
    {
-        if (i==5 && !(senddata[1][i]==0)) // Convert midpoint 3 if not missing
+        if (i==4 && !(senddata[0][i]==0)) // Convert midpoint 3 if not missing
         {
+           xyresult[0][4]=0;
+           xyresult[1][4]=senddata[0][5];
+        }
+        if (!(i==4) && !(i==7) && !(senddata[0][i]==0)) // If bot wall present convert it if not missing
+        {
+           xyresult[0][i]=senddata[0][4]-(senddata[0][i]*cos((180-senddata[1][i])*(PI/180)));
+           xyresult[1][i]=senddata[0][5]+(senddata[0][i]*sin((180-senddata[1][i])*(PI/180)));
+        }
+   }
+   if (senddata[1][8]>=senddata[1][i] && senddata[1][4]<=senddata[1][i]) // Evaluate section 5
+   {
+        if (i==8 && !(senddata[0][i]==0)) // Convert corner 3 if not missing
+        {
+           xyresult[0][8]=senddata[0][4]-(senddata[0][8]*cos((senddata[1][8]-180)*(PI/180)));
+           xyresult[1][8]=senddata[0][5]-(senddata[0][8]*sin((senddata[1][8]-180)*(PI/180)));
+        }
+        if (!(i==8) && !(i==4) && !(senddata[0][i]==0)) // If bot wall present convert it if not missing
+        {
+           xyresult[0][i]=senddata[0][4]-(senddata[0][i]*cos((senddata[1][i]-180)*(PI/180)));
+           xyresult[1][i]=senddata[0][5]-(senddata[0][i]*sin((senddata[1][i]-180)*(PI/180)));
+        }
+   }
+   if (senddata[1][5]>=senddata[1][i] && senddata[1][8]<=senddata[1][i]) // Evaluate section 6
+   {
+        if (!(i==5) && !(i==8) && !(senddata[0][i]==0)) // If bot wall present convert it if not missing
+        {
+           xyresult[0][i]=senddata[0][4]-(senddata[0][i]*sin((270-senddata[1][i])*(PI/180)));
+           xyresult[1][i]=senddata[0][5]-(senddata[0][i]*cos((270-senddata[1][i])*(PI/180)));
+        }
+   }
+   if (senddata[1][9]>=senddata[1][i] && senddata[1][5]<=senddata[1][i]) // Evaluate section 7
+   {
+        if (i==5 && !(senddata[0][i]==0)) // Convert midpoint 4 if not missing
+        {
+           xyresult[0][5]=senddata[0][4];
            xyresult[1][5]=0;
-           xyresult[2][5]=senddata[1][6];
         }
-        if (!(i==5) && !(i==8) && !(senddata[1][i]==0)) // If bot wall present convert it if not missing
+        if (!(i==9) && !(i==5) && !(senddata[0][i]==0)) // If bot wall present convert it if not missing
         {
-           xyresult[1][i]=senddata[1][5]-(senddata[1][i]*cos((180-senddata[2][i])*(PI/180)));
-           xyresult[2][i]=senddata[1][6]+(senddata[1][i]*sin((180-senddata[2][i])*(PI/180)));
-        }
-   }
-   if (senddata[2][9]>=senddata[2][i] && senddata[2][5]<=senddata[2][i]) // Evaluate section 5
-   {
-        if (i==9 && !(senddata[1][i]==0)) // Convert corner 3 if not missing
-        {
-           xyresult[1][9]=senddata[1][5]-(senddata[1][9]*cos((senddata[2][9]-180)*(PI/180)));
-           xyresult[2][9]=senddata[1][6]-(senddata[1][9]*sin((senddata[2][9]-180)*(PI/180)));
-        }
-        if (!(i==9) && !(i==5) && !(senddata[1][i]==0)) // If bot wall present convert it if not missing
-        {
-           xyresult[1][i]=senddata[1][5]-(senddata[1][i]*cos((senddata[2][i]-180)*(PI/180)));
-           xyresult[2][i]=senddata[1][6]-(senddata[1][i]*sin((senddata[2][i]-180)*(PI/180)));
+           xyresult[0][i]=senddata[0][4]+(senddata[0][i]*sin((senddata[1][i]-270)*(PI/180)));
+           xyresult[1][i]=senddata[0][5]-(senddata[0][i]*cos((senddata[1][i]-270)*(PI/180)));
         }
    }
-   if (senddata[2][6]>=senddata[2][i] && senddata[2][9]<=senddata[2][i]) // Evaluate section 6
+   if (360>=senddata[1][i] && senddata[1][9]<=senddata[1][i]) // Evaluate section 8
    {
-        if (!(i==6) && !(i==9) && !(senddata[1][i]==0)) // If bot wall present convert it if not missing
+        if (i==9 && !(senddata[0][i]==0)) // Convert corner 4 if not missing
         {
-           xyresult[1][i]=senddata[1][5]-(senddata[1][i]*sin((270-senddata[2][i])*(PI/180)));
-           xyresult[2][i]=senddata[1][6]-(senddata[1][i]*cos((270-senddata[2][i])*(PI/180)));
+           xyresult[0][9]=senddata[0][4]+(senddata[0][9]*sin((senddata[1][9]-270)*(PI/180)));
+           xyresult[1][9]=senddata[0][5]-(senddata[0][9]*cos((senddata[1][9]-270)*(PI/180)));
         }
-   }
-   if (senddata[2][10]>=senddata[2][i] && senddata[2][6]<=senddata[2][i]) // Evaluate section 7
-   {
-        if (i==6 && !(senddata[1][i]==0)) // Convert midpoint 4 if not missing
+        if (!(i==9) && !(senddata[0][i]==0)) // If bot wall present convert it if not missing
         {
-           xyresult[1][6]=senddata[1][5];
-           xyresult[2][6]=0;
-        }
-        if (!(i==10) && !(i==6) && !(senddata[1][i]==0)) // If bot wall present convert it if not missing
-        {
-           xyresult[1][i]=senddata[1][5]+(senddata[1][i]*sin((senddata[2][i]-270)*(PI/180)));
-           xyresult[2][i]=senddata[1][6]-(senddata[1][i]*cos((senddata[2][i]-270)*(PI/180)));
-        }
-   }
-   if (360>=senddata[2][i] && senddata[2][10]<=senddata[2][i]) // Evaluate section 8
-   {
-        if (i==10 && !(senddata[1][i]==0)) // Convert corner 4 if not missing
-        {
-           xyresult[1][10]=senddata[1][5]+(senddata[1][10]*sin((senddata[2][10]-270)*(PI/180)));
-           xyresult[2][10]=senddata[1][6]-(senddata[1][10]*cos((senddata[2][10]-270)*(PI/180)));
-        }
-        if (!(i==10) && !(senddata[1][i]==0)) // If bot wall present convert it if not missing
-        {
-           xyresult[1][i]=senddata[1][5]+(senddata[1][i]*cos((360-senddata[2][i])*(PI/180)));
-           xyresult[2][i]=senddata[1][6]-(senddata[1][i]*sin((360-senddata[2][i])*(PI/180)));
+           xyresult[0][i]=senddata[0][4]+(senddata[0][i]*cos((360-senddata[1][i])*(PI/180)));
+           xyresult[1][i]=senddata[0][5]-(senddata[0][i]*sin((360-senddata[1][i])*(PI/180)));
         }
    }
   }
 
   int lengthxy = sizeof(xyresult[0])/sizeof(xyresult[0][0]);
-  for(int i = 0; i <= lengthsd ; i++)
+  for(int i = 0; i <= lengthxy ; i++)
   {
+    Serial.println(xyresult[0][i]);
     Serial.println(xyresult[1][i]);
-    Serial.println(xyresult[2][i]);
   }
 }
