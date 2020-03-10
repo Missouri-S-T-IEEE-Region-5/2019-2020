@@ -61,7 +61,7 @@ void loop() {
 bool processing = 0;
 
 void loop() {
-  const int INPUT_SIZE = 1000; //Amount of bytes that will be sorted each time the relay is triggered
+  const int INPUT_SIZE = 1500; //Amount of bytes that will be sorted each time the relay is triggered
   byte storage[INPUT_SIZE];
   int counting = 0;
   byte x;
@@ -75,7 +75,7 @@ void loop() {
     {
       
      x = Serial.read();
-     Serial.println(number);
+     //Serial.println(number);
      storage[number] = x;
      number++;
     //counting++;
@@ -121,7 +121,7 @@ void loop() {
     for(int j=counting; j<number; j++) //J is 8 because in the first 7 Bytes only the first 2 are important
     {
       //Serial.println(storage[j]);
-      if(storage[j] == 0xAA && storage[j+1] == 0x55 && storage[j+3] > 20)
+      if(storage[j] == 0xAA && storage[j+1] == 0x55 && storage[j+3] > 30)
       {
  
         j+=3; //walks to the LSN
@@ -132,39 +132,71 @@ void loop() {
         j++; //walks to the FSA
         Start_ang = math(storage[j], storage[j+1]);
         Start_ang = angle_calc(Start_ang);
-        Serial.println(Start_ang);
+        
         j= j+2;//walks to the LSA
         End_ang = math(storage[j], storage[j+1]);
         End_ang = angle_calc(End_ang);
-        Serial.println(End_ang);
+        /*
+        if(End_ang < 0 || Start_ang < 0)
+        {
+          End_ang += 360;
+          Start_ang += 360;
+        }
+        */
+
+        //Serial.println(Start_ang);
+        //Serial.println(End_ang);
         j+=4;//walks to the first sample data
         Start_Pos = j;
         End_Pos = j + sample_rate;
+        
+        //Serial.println(" ");
+        //Serial.println(" ");
+        //Serial.println(Start_Pos);
+        //Serial.println(End_Pos);
+        //Serial.println(" ");
+        //Serial.println(" ");
+        
+
         store_angle = (End_ang - Start_ang);
         //store_angle = ((End_ang - Start_ang)/(sample_rate - 1));
         //Serial.println(store_angle);
         store_angle = (store_angle/(sample_rate-1));
-        for(int i=2; i < sample_rate-2; i++) // Does intermediate angle calculations
+        /*
+        for(int i=0; i < sample_rate; i++) // Does intermediate angle calculations
         {
           //Serial.println(Start_ang);
           //Serial.println(End_ang);
           //Serial.println(sample_rate);
           //Serial.println((End_ang-Start_ang);
-
           //Serial.println(store_angle);
           //Serial.println(((store_angle*(i-1))+Start_ang));
-          angle[i] = ((store_angle * (i - 1)) + Start_ang);
-          //Serial.println(angle[i]);
+          //angle[i] = ((store_angle * (i - 1)) + Start_ang);
+          //sorting[i+count][1] = ((store_angle * (i - 1)) + Start_ang);
+          //sorting[i+count][1] = angle[i];
+          Serial.println(" ");
+          Serial.println(" ");
+          Serial.println(count);
+          Serial.println(" ");
+          Serial.println(" ");
+          Serial.println(" ");
+
+          
           delay(10);
         }
-      
-      for(count; count < ((End_Pos - Start_Pos)+count); (count+=2))
+      */
+      int end_count = (End_Pos - Start_Pos)+count;
+      for(count; count < end_count; (count+=2))
       {
         sorting[((count)/2)][0] = (math(storage[count+Start_Pos], storage[count+Start_Pos+1]))/64;
-        sorting[((count)/2)][1] = angle[(((count)/2)) % sample_rate];
-        //Serial.println(sorting[count/2][0]);
-        //Serial.print(" ");
+        sorting[count/2][1] = ((store_angle * (((count/2)) - 1)) + Start_ang);
+        //sorting[((count)/2)][1] = angle[(((count)/2)) % sample_rate];
+        Serial.println(sorting[count/2][0]);
         Serial.println(sorting[count/2][1]);
+        //Serial.println(count);
+        Serial.println(" ");
+        Serial.println(" ");
+        delay(10);
       }
       
       j=j+count;
@@ -178,6 +210,7 @@ void loop() {
 
 
 }
+
 }
 
 
