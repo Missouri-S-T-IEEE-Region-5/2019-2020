@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include<Queue.h>
+#include <Queue.h>
 
 #define SLAVE_ADDRESS 0x15
 
@@ -44,27 +44,70 @@ void receiveData(int bytecount)
 
 void sendData()
 {
-  unsigned int dir = 2;
-  float x = 40.3;
-  float y = 12.7;
-
-  byte b[12];
-
-  if(queue.item_count() == 0)
+  static int num = 0;
+  typedef union
   {
-    for(int i = 3; i >= 0; i--)
-    {
-      b[i] = (dir >> (8*i)) & 0xFF;
-    }
+    float number;
+    uint8_t bytes[4];
+  } FLOATUNION_T;
+
+
+  unsigned int dir = 2;
+  float x = 23.84;
+  float y = 41.20;
+
+  FLOATUNION_T x_val;
+  x_val.number = x;
   
-    for(int k = 3; k >= 0; k--)
-    {
-      b[(k+3)] = (dir >> (8*k)) & 0xFF;
-    }
+  FLOATUNION_T y_val;
+  y_val.number = y;
+
+  FLOATUNION_T dir_val;
+  dir_val.number = dir;
+    
+  int num_idx = num%12;
+  if( num_idx >= 0 && num_idx < 4 )
+  {
+    Serial.print(x_val.bytes[num_idx]);
+    Wire.write(x_val.bytes[num_idx]);
+    Serial.print(" , ");
+  }
+  else if ( num_idx >= 4 && num_idx < 8 )
+  {
+    Serial.print(y_val.bytes[num_idx-4]);
+    Wire.write(y_val.bytes[num_idx-4]);
+    Serial.print(" , ");
+  }
+  else if( num_idx >= 8 && num_idx < 12 )
+  {
+    Serial.print(dir_val.bytes[num_idx-8]);
+    Wire.write(dir_val.bytes[num_idx-8]);
+    Serial.print(" , ");
+  }
+  num++;
+ 
   
-    for(int l = 3; l >= 0; l--)
+
+  
+  /*
+  if(queue.item_count() == 0)
+  { 
+    // x from 0-3
+    for(int i = 0; i < 4; i++)
     {
-      b[(l+7)] = (dir >> (8*l)) & 0xFF;
+      b[i] = ( x && (0xFF<<(8*(3-i))));
+    }
+   
+    // y from 4-7
+    for(int k = 0; k < 4; k++)
+    {
+      b[k+4] = ( y && (0xFF<<(8*(3-k))));
+    }
+    
+    // z from 8-11
+    for(int l = 0; l < 4; l++)
+    {
+      b[(l+7)] = ( dir && (0xFF<<(8*(3-l))));
     }
 
     for(int z = 0; z < 12; z++)
@@ -73,13 +116,15 @@ void sendData()
     }
 
     Serial.print(queue.front(), HEX);
-    Wire.write(queue.dequeue());
+    Wire.write(queue.front());
+    queue.dequeue();
   }
   else
   {
     Serial.print(queue.front(), HEX);
-    Wire.write(queue.dequeue());
-  }
+    Wire.write(queue.front());
+    queue.dequeue();
+  } */
 }
 
 void setup() 
