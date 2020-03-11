@@ -14,7 +14,6 @@ int piPositionPin = 11;
 int buttonPin = 2;
 DataQueue<byte> queue(12);
 
-
 void receiveData(int bytecount)
 {
   const int NUM_BITS_IN_BYTE = 8;   /* number of bits in a byte lol*/
@@ -85,46 +84,6 @@ void sendData()
     Serial.print(" , ");
   }
   num++;
- 
-  
-
-  
-  /*
-  if(queue.item_count() == 0)
-  { 
-    // x from 0-3
-    for(int i = 0; i < 4; i++)
-    {
-      b[i] = ( x && (0xFF<<(8*(3-i))));
-    }
-   
-    // y from 4-7
-    for(int k = 0; k < 4; k++)
-    {
-      b[k+4] = ( y && (0xFF<<(8*(3-k))));
-    }
-    
-    // z from 8-11
-    for(int l = 0; l < 4; l++)
-    {
-      b[(l+7)] = ( dir && (0xFF<<(8*(3-l))));
-    }
-
-    for(int z = 0; z < 12; z++)
-    {
-      queue.enqueue(b[z]);
-    }
-
-    Serial.print(queue.front(), HEX);
-    Wire.write(queue.front());
-    queue.dequeue();
-  }
-  else
-  {
-    Serial.print(queue.front(), HEX);
-    Wire.write(queue.front());
-    queue.dequeue();
-  } */
 }
 
 void setup() 
